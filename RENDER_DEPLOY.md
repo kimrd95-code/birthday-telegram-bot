@@ -1,131 +1,101 @@
-# Запуск бота бесплатно на Render (24/7)
+# Render бесплатно (2025–2026): Web Service, не Worker
 
-Бот будет работать **без включённого компьютера**. На бесплатном тарифе Render используется **Background Worker** — процесс с `python main.py` крутится на сервере.
+На Render **бесплатный план** есть только у **Web Service**.  
+**Background Worker** — только платные Instance Type (от ~$7/мес).
 
----
-
-## Важно про бесплатный тариф
-
-| Что | Как на Render Free |
-|-----|---------------------|
-| Работа бота | Да, пока сервис **Running** |
-| Лимит часов | ~750 часов/мес на все бесплатные сервисы аккаунта |
-| База SQLite | При **пересборке/редиплое** данные могут **сброситься** — коллегам нужно снова `/start`. Не жмите Redeploy без нужды |
-| `.env` на сервере | **Не загружают** — переменные задаются в панели Render |
+Бот переведён на режим **Webhook**: бесплатный Web Service + бесплатный **cron-job.org** для напоминаний в 09:00.
 
 ---
 
-## Часть 1. Выложить код на GitHub
+## Что выбрать в Render
 
-Render подключается к **GitHub**. Нужен репозиторий **только с папкой бота** (или весь проект, но тогда укажете подпапку).
-
-### Вариант А — через сайт GitHub (проще)
-
-1. Зайдите на [github.com](https://github.com), войдите в аккаунт.
-2. **New repository** → имя, например `birthday-telegram-bot` → **Create** (без README).
-3. На странице репозитория: **uploading an existing file**.
-4. Перетащите **все файлы** из папки  
-   `telegram-birthday-bot`  
-   (кроме `.venv`, `data/`, `.env` — их не заливайте).
-5. **Commit changes**.
-
-### Вариант Б — через Git в PowerShell
-
-```powershell
-cd "c:\Users\Lenovo\Desktop\ИИ. Обучение\Cursor\telegram-birthday-bot"
-git init
-git add .
-git commit -m "Birthday Telegram bot"
-git branch -M main
-git remote add origin https://github.com/ВАШ_ЛОГИН/birthday-telegram-bot.git
-git push -u origin main
-```
-
-*(Создайте пустой репозиторий на GitHub заранее.)*
+| Поле | Значение |
+|------|----------|
+| Тип сервиса | **Web Service** (не Background Worker) |
+| Instance Type | **Free** (если есть в списке для Web) |
+| Build Command | `pip install -r requirements.txt` |
+| Start Command | `python main.py` |
+| Health Check Path | `/` |
 
 ---
 
-## Часть 2. Создать сервис на Render
+## Environment Variables (обязательно)
 
-1. Зайдите на [render.com](https://render.com) → **Get Started** → войдите через **GitHub**.
-2. **New +** → **Background Worker** (не Web Service).
-3. **Connect repository** → выберите `birthday-telegram-bot`.
-4. Настройки:
+| Key | Value |
+|-----|--------|
+| `BOT_TOKEN` | токен @BotFather |
+| `ADMIN_TELEGRAM_IDS` | ваш Telegram Id |
+| `USE_WEBHOOK` | `true` |
+| `CRON_SECRET` | длинная случайная строка, напр. `mySecretCron2026xyz` |
+| `TIMEZONE` | `Europe/Moscow` |
+| `REMINDER_HOUR` | `9` |
 
-   | Поле | Значение |
-   |------|----------|
-   | **Name** | `birthday-telegram-bot` |
-   | **Region** | Frankfurt (или ближайший) |
-   | **Branch** | `main` |
-   | **Root Directory** | оставьте пустым, если в репозитории только файлы бота; если репозиторий — вся папка Cursor, укажите `telegram-birthday-bot` |
-   | **Runtime** | Python 3 |
-   | **Build Command** | `pip install -r requirements.txt` |
-   | **Start Command** | `python main.py` |
-   | **Instance Type** | **Free** |
+`RENDER_EXTERNAL_URL` Render подставит **сам** — не добавляйте вручную.
 
-5. Прокрутите до **Environment Variables** → **Add Environment Variable**:
-
-   | Key | Value |
-   |-----|--------|
-   | `BOT_TOKEN` | токен от @BotFather |
-   | `ADMIN_TELEGRAM_IDS` | ваш Id от @userinfobot |
-   | `TIMEZONE` | `Europe/Moscow` |
-   | `REMINDER_HOUR` | `9` |
-
-6. **Create Background Worker**.
-
-7. Дождитесь статуса **Live** / **Running** (первая сборка 3–10 минут).
-
-8. Вкладка **Logs** — должно быть что-то вроде:  
-   `Scheduler: daily at 9:00 ... Bot starting...`
+После деплоя в **Logs** должно быть: `Mode: webhook` и `Telegram webhook set`.
 
 ---
 
-## Часть 3. Проверка
+## Шаг: напоминания в 09:00 (cron-job.org)
 
-1. В Telegram откройте бота → **Start** → регистрация.
-2. Отправьте `/test_reminders` (если ваш ID в `ADMIN_TELEGRAM_IDS`).
-3. На Render в **Logs** не должно быть ошибок `BOT_TOKEN` или `Forbidden`.
+Бесплатный Web на Render **засыпает** без трафика. Напоминания запускает внешний cron:
+
+1. Зайдите на [cron-job.org](https://cron-job.org) (бесплатная регистрация).
+2. **Create cron job**:
+   - **Title:** Birthday bot reminders
+   - **URL:**  
+     `https://ВАШ-СЕРВИС.onrender.com/cron/daily?key=ВАШ_CRON_SECRET`  
+     (скопируйте URL сервиса из Render Dashboard + тот же `CRON_SECRET`, что в Variables)
+   - **Schedule:** каждый день **09:00**, timezone **Europe/Moscow**
+   - **Request method:** GET
+3. Сохраните.
+
+Проверка: откройте URL в браузере — должно показать `ok` (не `forbidden`).
 
 ---
 
-## Часть 4. Обновление бота после правок
+## Опционально: не давать боту засыпать
 
-1. Загрузите изменения на GitHub (commit + push или Upload file).
-2. Render обычно **деплоит сам** (Auto-Deploy).
-3. После деплоя база на бесплатном диске может обнулиться — предупредите коллег при больших обновлениях.
+На Free Web сервис «просыпается» от сообщений в Telegram (webhook).  
+Для надёжности можно добавить второй cron на cron-job.org:
 
-**Локальный ПК:** `python main.py` на компьютере **остановите**, иначе два процесса с одним токеном будут конфликтовать (двойные ответы, ошибки).
+- URL: `https://ВАШ-СЕРВИС.onrender.com/`
+- Каждые **14 минут**
+
+Тогда первый ответ иногда будет с задержкой 30–60 сек после сна — это норма Free tier.
 
 ---
 
-## Blueprint (одной кнопкой)
+## Локально на ПК (как раньше)
 
-Если репозиторий уже на GitHub с файлом `render.yaml` в корне:
+В `.env` **не** ставьте `USE_WEBHOOK` — бот работает в режиме **polling** + встроенный планировщик 09:00.
 
-1. Render Dashboard → **New +** → **Blueprint**.
-2. Укажите репозиторий → Render создаст Worker по `render.yaml`.
-3. Вручную добавьте секреты `BOT_TOKEN` и `ADMIN_TELEGRAM_IDS` (помечены `sync: false`).
+---
+
+## Платный Worker на Render
+
+Если нужен Worker без webhook и cron-job.org — выберите минимальный **Instance Type** (платный) и в Variables **уберите** `USE_WEBHOOK` (или `false`), Start Command `python main.py` — снова polling + APScheduler.
 
 ---
 
 ## Частые ошибки
 
-**Build failed** — проверьте `requirements.txt`, Root Directory, Python 3.12 в `runtime.txt`.
-
-**Deploy failed / сразу падает** — нет `BOT_TOKEN` в Environment Variables.
-
-**Бот не отвечает** — на Render сервис не Running; или бот ещё запущен у вас на ПК с тем же токеном.
-
-**Напоминания не в 09:00** — часовой пояс `TIMEZONE=Europe/Moscow`, сервер Render в UTC, но APScheduler использует вашу зону из конфига.
-
-**Превышен лимит 750 ч/мес** — бесплатный лимит исчерпан до следующего месяца; временно запуск на ПК или платный план.
+| Симптом | Решение |
+|---------|---------|
+| Только платные Instance Type | Вы создали **Worker** → удалите, создайте **Web Service** |
+| `forbidden` на cron URL | Неверный `key=` в URL, должен совпадать с `CRON_SECRET` |
+| Бот не отвечает после сна | Подождите ~1 мин или добавьте ping каждые 14 мин |
+| Два бота с одним токеном | Остановите `python main.py` на ПК |
 
 ---
 
-## Стоимость
+## Обновление кода на GitHub
 
-- **Free Worker** — $0, с лимитами выше.
-- Карта для Free часто не нужна, но Render может попросить при регистрации — смотрите актуальные правила на сайте.
+```powershell
+cd "путь\к\telegram-birthday-bot"
+git add .
+git commit -m "Webhook mode for Render free"
+git push
+```
 
-После деплоя компьютер можно **выключать** — бот живёт на Render.
+Render пересоберёт сервис сам.

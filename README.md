@@ -180,7 +180,7 @@ telegram-birthday-bot/
 ## Работа 24/7 (без вашего ПК) — Render бесплатно
 
 Пошаговая инструкция: **[RENDER_DEPLOY.md](RENDER_DEPLOY.md)**  
-Кратко: код на GitHub → Render → **Background Worker** (не Web Service) → переменные `BOT_TOKEN`, `ADMIN_TELEGRAM_IDS` в панели → **Create**.
+Кратко: GitHub → Render → **Web Service** (Free; Worker только платный) → `USE_WEBHOOK=true`, `CRON_SECRET` → cron-job.org на 09:00.
 
 После деплоя **не запускайте** бота на ПК с тем же токеном.
 

@@ -11,20 +11,25 @@ TIMEZONE = os.getenv("TIMEZONE", "Europe/Moscow")
 REMINDER_HOUR = int(os.getenv("REMINDER_HOUR", "9"))
 BOT_USERNAME = os.getenv("BOT_USERNAME", "").strip()
 
-# Telegram ID админов через запятую (для /test_reminders)
 _admin = os.getenv("ADMIN_TELEGRAM_IDS", "").strip()
 ADMIN_TELEGRAM_IDS = [
     int(x.strip()) for x in _admin.split(",") if x.strip().isdigit()
 ]
 
-# На Render можно задать путь к БД (по умолчанию data/bot.db в папке проекта)
 _db = os.getenv("DATABASE_PATH", "").strip()
 DATABASE_PATH = Path(_db) if _db else BASE_DIR / "data" / "bot.db"
 MESSAGES_PATH = BASE_DIR / "messages.ru.yaml"
 
 INITIATOR_TIMEOUT_HOURS = 12
-
-# Дни до ДР для напоминаний
 DAYS_WEEK_BEFORE = 7
-DAYS_NO_CHAT_REMINDERS = (6, 4, 2)  # через день после -7: -6, -4, -2
+DAYS_NO_CHAT_REMINDERS = (6, 4, 2)
 DAYS_NOT_JOINED = 2
+
+# Render Free = Web Service (не Worker). Webhook + внешний cron.
+PORT = int(os.getenv("PORT", "10000"))
+RENDER_URL = os.getenv("RENDER_EXTERNAL_URL", "").strip().rstrip("/")
+WEBHOOK_BASE = os.getenv("WEBHOOK_URL", "").strip().rstrip("/") or RENDER_URL
+_use = os.getenv("USE_WEBHOOK", "").strip().lower()
+USE_WEBHOOK = _use in ("1", "true", "yes") or bool(RENDER_URL and os.getenv("RENDER"))
+WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET", "").strip()
+CRON_SECRET = os.getenv("CRON_SECRET", "").strip()
