@@ -1,0 +1,21 @@
+# Blueprint Render: Background Worker (бот работает 24/7 без вашего ПК)
+# https://render.com/docs/background-workers
+
+services:
+  - type: worker
+    name: birthday-telegram-bot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      - key: TIMEZONE
+        value: Europe/Moscow
+      - key: REMINDER_HOUR
+        value: "9"
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_TELEGRAM_IDS
+        sync: false
