@@ -3,7 +3,7 @@
 На Render **бесплатный план** есть только у **Web Service**.  
 **Background Worker** — только платные Instance Type (от ~$7/мес).
 
-Бот переведён на режим **Webhook**: бесплатный Web Service + бесплатный **cron-job.org** для напоминаний в 09:00.
+Бот переведён на режим **Webhook**: бесплатный Web Service + бесплатный **cron-job.org** для напоминаний в 11:00.
 
 ---
 
@@ -28,7 +28,7 @@
 | `USE_WEBHOOK` | `true` |
 | `CRON_SECRET` | длинная случайная строка, напр. `mySecretCron2026xyz` |
 | `TIMEZONE` | `Europe/Moscow` |
-| `REMINDER_HOUR` | `9` |
+| `REMINDER_HOUR` | `11` |
 
 `RENDER_EXTERNAL_URL` Render подставит **сам** — не добавляйте вручную.
 
@@ -36,7 +36,7 @@
 
 ---
 
-## Шаг: напоминания в 09:00 (cron-job.org)
+## Шаг: напоминания в 11:00 (cron-job.org)
 
 Бесплатный Web на Render **засыпает** без трафика. Напоминания запускает внешний cron:
 
@@ -46,7 +46,7 @@
    - **URL:**  
      `https://ВАШ-СЕРВИС.onrender.com/cron/daily?key=ВАШ_CRON_SECRET`  
      (скопируйте URL сервиса из Render Dashboard + тот же `CRON_SECRET`, что в Variables)
-   - **Schedule:** каждый день **09:00**, timezone **Europe/Moscow**
+   - **Schedule:** каждый день **11:00**, timezone **Europe/Moscow**
    - **Request method:** GET
 3. Сохраните.
 
@@ -68,7 +68,7 @@
 
 ## Локально на ПК (как раньше)
 
-В `.env` **не** ставьте `USE_WEBHOOK` — бот работает в режиме **polling** + встроенный планировщик 09:00.
+В `.env` **не** ставьте `USE_WEBHOOK` — бот работает в режиме **polling** + встроенный планировщик 11:00.
 
 ---
 

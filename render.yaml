@@ -15,7 +15,7 @@ services:
       - key: TIMEZONE
         value: Europe/Moscow
       - key: REMINDER_HOUR
-        value: "9"
+        value: "11"
       - key: BOT_TOKEN
         sync: false
       - key: ADMIN_TELEGRAM_IDS

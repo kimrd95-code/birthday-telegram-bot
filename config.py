@@ -8,7 +8,7 @@ load_dotenv(BASE_DIR / ".env")
 
 BOT_TOKEN = os.getenv("BOT_TOKEN", "").strip()
 TIMEZONE = os.getenv("TIMEZONE", "Europe/Moscow")
-REMINDER_HOUR = int(os.getenv("REMINDER_HOUR", "9"))
+REMINDER_HOUR = int(os.getenv("REMINDER_HOUR", "11"))
 BOT_USERNAME = os.getenv("BOT_USERNAME", "").strip()
 
 _admin = os.getenv("ADMIN_TELEGRAM_IDS", "").strip()

@@ -14,5 +14,22 @@ if (-not (Test-Path ".env")) {
     exit 1
 }
 
+# Старые копии .env с шаблоном 9:00 → 11:00 (остальные значения не трогаем)
+$envPath = Join-Path $Root ".env"
+$envLines = Get-Content -LiteralPath $envPath
+$migrated = $false
+$newEnv = foreach ($line in $envLines) {
+    if ($line -match '^\s*REMINDER_HOUR\s*=\s*9\s*$') {
+        $migrated = $true
+        "REMINDER_HOUR=11"
+    } else {
+        $line
+    }
+}
+if ($migrated) {
+    $newEnv | Set-Content -LiteralPath $envPath -Encoding utf8
+    Write-Host "В .env обновлено: REMINDER_HOUR=11 (раньше было 9)."
+}
+
 pip install -r requirements.txt -q
 python main.py

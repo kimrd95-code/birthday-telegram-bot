@@ -66,7 +66,7 @@ copy .env.example .env
 ```env
 BOT_TOKEN=вставьте_токен_от_BotFather
 TIMEZONE=Europe/Moscow
-REMINDER_HOUR=9
+REMINDER_HOUR=11
 ADMIN_TELEGRAM_IDS=ваш_telegram_id
 ```
 
@@ -82,7 +82,7 @@ ADMIN_TELEGRAM_IDS=ваш_telegram_id
 python main.py
 ```
 
-Должно появиться что-то вроде: `Scheduler: daily at 9:00 ... Bot starting...`
+Должно появиться что-то вроде: `Scheduler: daily at 11:00 ... Bot starting...`
 
 Окно **не закрывайте** — пока оно открыто, бот работает. Для постоянной работы позже можно VPS или планировщик Windows (см. ниже).
 
@@ -141,7 +141,7 @@ python main.py
 | ДР − 2 дня | зарегистрированные, не вступившие в чат | «вы не вступили» |
 | день ДР | только именинник | поздравление (ротация текстов) |
 
-Ежедневная проверка в **REMINDER_HOUR** (по умолчанию 09:00, часовой пояс **TIMEZONE**).
+Ежедневная проверка в **REMINDER_HOUR** (по умолчанию 11:00, часовой пояс **TIMEZONE**).
 
 ---
 
@@ -169,7 +169,7 @@ telegram-birthday-bot/
 
 **Бот не отвечает** — проверьте, что `python main.py` запущен и нет ошибки в консоли.
 
-**Напоминания не приходят** — пользователь не нажал Start / не завершил регистрацию; дата ДР не попадает на «сегодня + 7 дней»; бот не был запущен в 09:00 (используйте `/test_reminders`).
+**Напоминания не приходят** — пользователь не нажал Start / не завершил регистрацию; дата ДР не попадает на «сегодня + 7 дней»; бот не был запущен в 11:00 (используйте `/test_reminders`).
 
 **`/done` не работает** — команда только в **группе**; бот должен быть **админом** с правом invite link.
 
@@ -180,7 +180,7 @@ telegram-birthday-bot/
 ## Работа 24/7 (без вашего ПК) — Render бесплатно
 
 Пошаговая инструкция: **[RENDER_DEPLOY.md](RENDER_DEPLOY.md)**  
-Кратко: GitHub → Render → **Web Service** (Free; Worker только платный) → `USE_WEBHOOK=true`, `CRON_SECRET` → cron-job.org на 09:00.
+Кратко: GitHub → Render → **Web Service** (Free; Worker только платный) → `USE_WEBHOOK=true`, `CRON_SECRET` → cron-job.org на 11:00.
 
 После деплоя **не запускайте** бота на ПК с тем же токеном.
 
